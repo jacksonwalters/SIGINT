@@ -1,2 +1,2 @@
 # SIGINT
-introduction to SIGINT techniques in Python, MATLAB
+introduction to SIGINT techniques in Python
