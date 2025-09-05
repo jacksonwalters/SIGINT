@@ -16,7 +16,7 @@ jitter1 = 5e-6         # standard deviation of PRI jitter
 
 # emitter 2
 pulse_width2 = 8e-6    # 8 us
-PRI2 = 150e-6          # 150 us
+PRI2 = 159e-6          # 150 us
 jitter2 = 8e-6         # standard deviation of PRI jitter
 
 # noise level (SNR in dB relative to pulse energy)
@@ -96,7 +96,7 @@ auto_pos_smooth = np.convolve(auto_pos, kernel, mode='same')
 # Peak detection
 # -----------------------------
 prominence = 0.12 * np.max(auto_pos_smooth)
-min_distance = int(0.5 * min(PRI1, PRI2) * fs)
+min_distance = int(0.3 * min(PRI1, PRI2) * fs)
 peaks, props = find_peaks(auto_pos_smooth, prominence=prominence, distance=min_distance)
 peak_lags = lags_pos[peaks]
 peak_lags_us = peak_lags * 1e6
@@ -105,7 +105,7 @@ peak_lags_us = peak_lags * 1e6
 # Harmonic-rejection to find fundamental PRIs (fixed)
 # -----------------------------
 fundamentals = []
-tol = 0.08  # 8% tolerance
+tol = 0.03  # 2% tolerance
 
 for lag_us in np.sort(peak_lags_us):
     if lag_us < 0.5 * min(PRI1, PRI2) * 1e6:
@@ -113,19 +113,16 @@ for lag_us in np.sort(peak_lags_us):
     is_harmonic = False
     for f in fundamentals:
         ratio = lag_us / f
-        # reject only if it’s a near integer multiple (not too close to 1)
-        if abs(ratio - round(ratio)) < tol and abs(ratio - 1.0) > tol:
+        # reject if it's an approximate integer multiple of a known fundamental
+        if abs(ratio - round(ratio)) < tol:
             is_harmonic = True
             break
     if not is_harmonic:
         fundamentals.append(lag_us)
 
-# Keep only the number of known emitters
+# Keep only the number of emitters
 N_emitters = 2
 fundamentals = fundamentals[:N_emitters]
-
-print("Estimated fundamental PRIs (µs):", np.round(fundamentals, 2))
-
 
 # -----------------------------
 # Print results
