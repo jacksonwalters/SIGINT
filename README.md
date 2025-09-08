@@ -1,5 +1,7 @@
 # SIGINT
-introduction to SIGINT techniques in Python
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+
+A collection of Python scripts serving as an introduction to SIGINT (signal intelligence) techniques.
 
 - `amplitude_modulation.py`: generate a sequence of amplitude-moduled pulses, use filtering and autocorrelation to estimate PRI (pulse repitition interval)
 - `basic_workflow.py`: generate pulse train, add Gaussian noise, use autocorrelation to estimate PRI
