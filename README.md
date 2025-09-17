@@ -3,7 +3,7 @@
 
 A collection of Python scripts serving as an introduction to SIGINT (signal intelligence) techniques.
 
-**Dependencies:** `numpy`, `scipy`, `matplotlib`
+`pip install requirements.txt`
 
 - `amplitude_modulation.py`: generate a sequence of amplitude-moduled pulses, use filtering and autocorrelation to estimate PRI (pulse repitition interval)
 - `basic_workflow.py`: generate pulse train, add Gaussian noise, use autocorrelation to estimate PRI
