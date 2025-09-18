@@ -52,3 +52,22 @@ def estimate_PRI_from_mf(mf_output, t, threshold_ratio=0.5):
     mean_PRI = np.mean(estimated_PRIs)
     std_PRI = np.std(estimated_PRIs)
     return mean_PRI, std_PRI, peak_times, estimated_PRIs
+
+def detect_fundamental_PRIs(auto_pos, lags_pos, N_emitters=2, min_PRI=None, tol=0.03, smooth_signal=None):
+    """
+    Detect fundamental PRIs from autocorrelation peaks with harmonic rejection.
+    """
+    signal_to_use = smooth_signal if smooth_signal is not None else auto_pos
+    prominence = 0.12 * np.max(signal_to_use)
+    min_distance = int(0.3 * min_PRI * 1e6) if min_PRI is not None else 1
+    peaks, _ = find_peaks(signal_to_use, prominence=prominence, distance=min_distance)
+    peak_lags_us = lags_pos[peaks] * 1e6
+
+    fundamentals = []
+    for lag_us in np.sort(peak_lags_us):
+        if min_PRI and lag_us < 0.5 * min_PRI*1e6:
+            continue
+        is_harmonic = any(abs(lag_us/f - round(lag_us/f)) < tol for f in fundamentals)
+        if not is_harmonic:
+            fundamentals.append(lag_us)
+    return np.array(fundamentals[:N_emitters]), peak_lags_us, peaks

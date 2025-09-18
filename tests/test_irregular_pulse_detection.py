@@ -1,9 +1,7 @@
 import numpy as np
 from sigint_examples.simulation import generate_irregular_pulses
 from sigint_examples.processing import matched_filter, autocorrelation, estimate_PRI_from_mf
-from sigint_examples.plotting import plot_time_domain, plot_autocorr, plot_histogram
-
-SHOW_PLOTS = False
+from sigint_examples.plotting import plot_time_domain, plot_autocorr, plot_histogram, SHOW_PLOTS
 
 def test_irregular_pulse_workflow():
     # Generate signal

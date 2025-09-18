@@ -8,10 +8,7 @@ from sigint_examples.processing import (
     estimate_PRI_from_autocorr,
     estimate_pulse_width_from_autocorr,
 )
-from sigint_examples.plotting import plot_time_domain, plot_autocorr, plot_histogram
-
-# Optional flag to display plots
-SHOW_PLOTS = False
+from sigint_examples.plotting import plot_time_domain, plot_autocorr, plot_histogram, SHOW_PLOTS
 
 def test_amplitude_modulation_workflow():
     # -----------------------------
