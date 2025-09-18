@@ -142,3 +142,41 @@ def estimate_PRI_statistics(pulse_times_detected):
         estimated_PRIs_clean = estimated_PRIs
 
     return estimated_PRIs_clean, mean_PRI_clean, std_PRI_clean
+
+def matched_filter_chirp(rx_signal, pulse_width, fs, fc, bandwidth):
+    """Apply matched filter using a single chirp template."""
+    pulse_samples = int(pulse_width * fs)
+    tau_template = np.arange(pulse_samples) / fs
+    k = bandwidth / pulse_width
+    template = np.cos(2*np.pi*fc*tau_template + np.pi*k*tau_template**2)
+    
+    mf_output = convolve(rx_signal, template[::-1], mode='same')
+    return mf_output
+
+def detect_peaks(mf_output, t, threshold_factor=0.5):
+    """Detect peaks in matched filter output and estimate PRIs."""
+    peak_indices, _ = find_peaks(mf_output, height=threshold_factor*np.max(mf_output))
+    peak_times = t[peak_indices]
+    estimated_PRIs = np.diff(peak_times)
+    PRI_estimate = np.median(estimated_PRIs) if len(estimated_PRIs) > 0 else None
+    return peak_indices, peak_times, estimated_PRIs, PRI_estimate
+
+def estimate_pulse_widths(mf_output, t, peak_indices, window=20):
+    """Estimate pulse width from matched filter peak widths at half maximum."""
+    widths = []
+    for idx in peak_indices:
+        start = max(idx - window, 0)
+        end = min(idx + window, len(mf_output))
+        segment = mf_output[start:end]
+        segment_times = t[start:end]
+
+        half_max = mf_output[idx] / 2
+        # left
+        left_candidates = np.where(segment[:window] <= half_max)[0]
+        left_idx = left_candidates[-1] if len(left_candidates) > 0 else 0
+        # right
+        right_candidates = np.where(segment[window:] <= half_max)[0]
+        right_idx = right_candidates[0] + window if len(right_candidates) > 0 else len(segment) - 1
+
+        widths.append(segment_times[right_idx] - segment_times[left_idx])
+    return np.median(widths) if widths else None

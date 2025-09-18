@@ -158,3 +158,25 @@ def generate_gaussian_jittered_pulses(fs, duration, base_PRI, pulse_width, jitte
         rx[mask] = 1.0
 
     return t, rx, pulse_times
+
+import numpy as np
+
+def chirp_pulse(t, t0, pulse_width, fc, bw):
+    """Generate a single linear chirp pulse starting at t0."""
+    pulse_mask = (t >= t0) & (t < t0 + pulse_width)
+    tau = t[pulse_mask] - t0
+    k = bw / pulse_width  # chirp rate (Hz/s)
+    pulse = np.cos(2*np.pi*fc*tau + np.pi*k*tau**2)
+    return pulse_mask, pulse
+
+def generate_chirped_train(fs, duration, PRI, pulse_width, fc, bandwidth):
+    """Generate a chirped pulse train over a duration."""
+    t = np.arange(0, duration, 1/fs)
+    rx_signal = np.zeros_like(t)
+    pulse_times = np.arange(0, duration, PRI)
+    
+    for pt in pulse_times:
+        mask, pulse = chirp_pulse(t, pt, pulse_width, fc, bandwidth)
+        rx_signal[mask] += pulse
+        
+    return t, rx_signal, pulse_times
