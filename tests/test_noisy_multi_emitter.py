@@ -1,7 +1,7 @@
 import numpy as np
 from sigint_examples.simulation import generate_pulse_train
 from sigint_examples.processing import autocorrelation, detect_fundamental_PRIs, add_awgn
-from sigint_examples.plotting import plot_time_domain, plot_autocorr, SHOW_PLOTS
+from sigint_examples.plotting import plot_time_domain, plot_autocorr
 
 def test_noisy_multi_emitter_workflow(show_plots):
     fs = 1_000_000

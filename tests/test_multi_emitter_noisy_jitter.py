@@ -1,7 +1,7 @@
 import numpy as np
 from sigint_examples.simulation import generate_multi_emitter_jittered_pulses
 from sigint_examples.processing import autocorrelation, detect_fundamental_PRIs
-from sigint_examples.plotting import plot_time_domain, SHOW_PLOTS
+from sigint_examples.plotting import plot_time_domain
 
 def test_multi_emitter_jitter_workflow(show_plots):
     # -----------------------------
