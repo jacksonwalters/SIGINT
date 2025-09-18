@@ -1,5 +1,6 @@
 # SIGINT
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+![Python Tests](https://github.com/jacksonwalters/SIGINT/actions/workflows/python-tests.yml/badge.svg)
 
 A collection of Python scripts serving as an introduction to SIGINT (signal intelligence) techniques.
 
