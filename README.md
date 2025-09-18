@@ -26,8 +26,8 @@ python -m sigint_examples.basic_workflow --show-plots
 
 ## Tests
 
-```bash
-python -m pytest tests/test_<specific-example>.py --show-plots
+```
+python -m pytest tests/test_<specific-case>.py --show-plots
 ```
 
 - `tests/test_amplitude_modulation.py`: generate a sequence of amplitude-moduled pulses, use filtering and autocorrelation to estimate PRI (pulse repitition interval)
