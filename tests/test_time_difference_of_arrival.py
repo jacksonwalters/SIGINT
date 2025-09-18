@@ -2,10 +2,9 @@
 import numpy as np
 from sigint_examples.simulation import generate_time_delay_pulses
 from sigint_examples.processing import estimate_delay
-from sigint_examples.plotting import SHOW_PLOTS
 import matplotlib.pyplot as plt
 
-def test_tdoa_basic():
+def test_tdoa_basic(show_plots):
     fs = 1_000_000          # 1 MHz
     duration = 0.002         # 2 ms
     pulse_width = 5e-6       # 5 µs
@@ -35,7 +34,7 @@ def test_tdoa_basic():
     assert len(lags) == len(cross_corr)
     assert np.max(cross_corr) > 0
 
-    if SHOW_PLOTS:
+    if show_plots:
         plt.figure()
         plt.subplot(2,1,1)
         plt.plot(t*1e3, rx1, label="Receiver 1")

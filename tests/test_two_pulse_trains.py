@@ -1,9 +1,9 @@
 import numpy as np
 from sigint_examples.simulation import generate_two_pulse_train
 from sigint_examples.processing import autocorr_two_pulses, estimate_fundamentals
-from sigint_examples.plotting import plot_two_pulse_autocorr, SHOW_PLOTS
+from sigint_examples.plotting import plot_two_pulse_autocorr
 
-def test_two_pulse_trains_basic():
+def test_two_pulse_trains_basic(show_plots):
     fs = 1_000_000
     duration = 0.005
     PRI1, pulse_width1 = 100e-6, 5e-6
@@ -28,5 +28,5 @@ def test_two_pulse_trains_basic():
     # -----------------------------
     # Plotting (optional, show only if debugging)
     # -----------------------------
-    if SHOW_PLOTS:
+    if show_plots:
         plot_two_pulse_autocorr(positive_lags, auto_positive, fundamentals)

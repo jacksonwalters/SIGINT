@@ -3,7 +3,7 @@ from sigint_examples.simulation import generate_multi_emitter_jittered_pulses
 from sigint_examples.processing import autocorrelation, detect_fundamental_PRIs
 from sigint_examples.plotting import plot_time_domain, SHOW_PLOTS
 
-def test_multi_emitter_jitter_workflow():
+def test_multi_emitter_jitter_workflow(show_plots):
     # -----------------------------
     # Define emitters
     # -----------------------------
@@ -19,7 +19,7 @@ def test_multi_emitter_jitter_workflow():
     assert rx.shape == t.shape
     assert len(pulse_times_list) == 2
 
-    if SHOW_PLOTS:
+    if show_plots:
         plot_time_domain(t, rx, title="Multi-Emitter Jittered Pulses")
 
     # -----------------------------

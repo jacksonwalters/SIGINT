@@ -3,7 +3,7 @@ from sigint_examples.simulation import generate_gaussian_jittered_pulses
 from sigint_examples.processing import add_awgn, matched_filter_detect, estimate_PRI_statistics
 from sigint_examples.plotting import plot_time_domain, plot_matched_filter, plot_PRI_histogram, plot_PRI_vs_time, SHOW_PLOTS
 
-def test_gaussian_jittered_workflow():
+def test_gaussian_jittered_workflow(show_plots):
     fs = 1_000_000
     duration = 0.01
     base_PRI = 100e-6
@@ -32,7 +32,7 @@ def test_gaussian_jittered_workflow():
     assert abs(mean_PRI_clean - base_PRI) < 20e-6  # within 20 µs
     assert std_PRI_clean > 0
 
-    if SHOW_PLOTS:
+    if show_plots:
         plot_time_domain(t, rx, rx_noisy, detected_pulses=pulse_times_detected, zoom=(0, 0.005))
         plot_matched_filter(t_valid, mf_output, peaks, threshold, zoom=(0, 0.005))
         plot_PRI_histogram(estimated_PRIs_clean, base_PRI, mean_PRI_clean)

@@ -3,7 +3,7 @@ from sigint_examples.simulation import generate_pulse_train
 from sigint_examples.processing import autocorrelation, detect_fundamental_PRIs, add_awgn
 from sigint_examples.plotting import plot_time_domain, plot_autocorr, SHOW_PLOTS
 
-def test_noisy_multi_emitter_workflow():
+def test_noisy_multi_emitter_workflow(show_plots):
     fs = 1_000_000
     duration = 0.01
     emitters = [
@@ -20,7 +20,7 @@ def test_noisy_multi_emitter_workflow():
 
     rx = add_awgn(rx_clean, SNR_dB=-3)
 
-    if SHOW_PLOTS:
+    if show_plots:
         plot_time_domain(t, rx, title="Noisy Multi-Emitter Pulses")
 
     auto, lags = autocorrelation(rx)
@@ -32,7 +32,7 @@ def test_noisy_multi_emitter_workflow():
         auto_pos, lags_pos, N_emitters=2, min_PRI=min([e["PRI"] for e in emitters])
     )
 
-    if SHOW_PLOTS:
+    if show_plots:
         plot_autocorr(lags_pos, auto_pos, peaks=peaks, fundamentals=fundamentals)
 
     assert len(fundamentals) <= 2

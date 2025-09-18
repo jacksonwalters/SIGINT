@@ -1,26 +1,67 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
-SHOW_PLOTS = False
-
-def plot_time_domain(t, signal, title="Signal"):
-    plt.figure(figsize=(12,4))
-    plt.plot(t*1e3, signal)
+def plot_time_domain(t, signal, title="Signal", detected_peaks=None, zoom=None):
+    """
+    Plot a 1D time-domain signal.
+    Optionally mark detected peaks and zoom into a specific interval.
+    
+    Parameters
+    ----------
+    t : array-like
+        Time axis (seconds)
+    signal : array-like
+        Signal values
+    title : str
+        Plot title
+    detected_peaks : array-like, optional
+        Times of detected peaks
+    zoom : tuple(float, float), optional
+        Time range to zoom in (start, end) in seconds
+    """
+    plt.figure(figsize=(12, 4))
+    plt.plot(t*1e3, signal, label="Signal")
+    
+    if detected_peaks is not None:
+        plt.plot(np.array(detected_peaks)*1e3, signal[np.array([int(ti*len(signal)/t[-1]) for ti in detected_peaks])],
+                 "ro", label="Detected Peaks")
+    
+    if zoom is not None:
+        plt.xlim(zoom[0]*1e3, zoom[1]*1e3)
+    
     plt.title(title)
     plt.xlabel("Time (ms)")
     plt.ylabel("Amplitude")
     plt.grid(True)
+    if detected_peaks is not None:
+        plt.legend()
     plt.show()
 
-def plot_autocorr(lags, auto, peak_lags=None, title="Autocorrelation"):
-    plt.figure(figsize=(12,4))
+def plot_autocorr(lags, auto, title="Autocorrelation", peak_lags=None):
+    """
+    Plot autocorrelation and optionally mark detected peaks.
+    
+    Parameters
+    ----------
+    lags : array-like
+        Lag times (seconds)
+    auto : array-like
+        Autocorrelation values
+    peak_lags : array-like, optional
+        Lag times of detected peaks
+    """
+    plt.figure(figsize=(12, 4))
     plt.plot(lags*1e6, auto, label="Autocorrelation")
     if peak_lags is not None:
-        plt.plot(peak_lags*1e6, auto[[int(p) for p in peak_lags]], "ro", label="Detected Peaks")
+        plt.plot(np.array(peak_lags)*1e6,
+                 auto[np.array([int(p*len(auto)/lags[-1]) for p in peak_lags])],
+                 "ro", label="Detected Peaks")
     plt.title(title)
     plt.xlabel("Lag (µs)")
     plt.ylabel("Amplitude")
     plt.grid(True)
-    plt.legend()
+    if peak_lags is not None:
+        plt.legend()
     plt.show()
 
 def plot_histogram(data, bins=10, title="Histogram", xlabel="Value", ylabel="Count"):

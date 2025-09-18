@@ -1,8 +1,9 @@
 import numpy as np
 from sigint_examples.simulation import generate_chirped_train
-from sigint_examples.processing import matched_filter_chirp, detect_peaks, estimate_pulse_widths, add_awgn
+from sigint_examples.processing import matched_filter_chirp, detect_peaks, estimate_pulse_widths, add_awgn, autocorrelation
+from sigint_examples.plotting import plot_time_domain, plot_autocorr
 
-def test_chirped_pulse_detection_workflow():
+def test_chirped_pulse_detection_workflow(show_plots):
     # -----------------------------
     # Parameters
     # -----------------------------
@@ -47,3 +48,14 @@ def test_chirped_pulse_detection_workflow():
 
     # Optional: check that MF output is roughly same length as input
     assert len(mf_output) == len(rx_signal_noisy)
+
+    if show_plots:
+        # Time-domain plot of noisy signal
+        plot_time_domain(t, rx_signal_noisy, title="Chirped Pulse Train in Noise", detected_peaks=peak_times, zoom=(0, 0.002))
+
+        # Matched filter output with peaks
+        plot_time_domain(t, mf_output, title="Matched Filter Output", detected_peaks=peak_times, zoom=(0, 0.002))
+
+        # Autocorrelation of received signal
+        auto, lags = autocorrelation(rx_signal_noisy)
+        plot_autocorr(lags, auto, title="Autocorrelation of Chirped Pulse Train", peak_lags=peak_times)
