@@ -2,7 +2,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 ![basic-tests](https://github.com/jacksonwalters/SIGINT/actions/workflows/python-tests.yml/badge.svg)
 
-A collection of Python scripts serving as an introduction to SIGINT (signal intelligence) techniques.
+A collection of Python modules and tests serving as an introduction to SIGINT (signal intelligence) techniques.
 
 ## Dependencies
 
@@ -26,8 +26,8 @@ python -m sigint_examples.basic_workflow --show-plots
 
 ## Tests
 
-```bash
-python -m pytest tests/test_<specific-example>.py --show-plots
+```
+python -m pytest tests/test_<specific-case>.py --show-plots
 ```
 
 - `tests/test_amplitude_modulation.py`: generate a sequence of amplitude-moduled pulses, use filtering and autocorrelation to estimate PRI (pulse repitition interval)
