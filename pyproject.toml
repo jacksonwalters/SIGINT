@@ -16,3 +16,6 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/jacksonwalters/SIGINT"
+
+[project.scripts]
+sigint-workflow = "sigint_examples.basic_workflow:main"
