@@ -1,6 +1,8 @@
 # SIGINT
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 ![basic-tests](https://github.com/jacksonwalters/SIGINT/actions/workflows/python-tests.yml/badge.svg)
+![PyPI version](https://img.shields.io/pypi/v/sigint-examples?logo=pypi)
+![Python Version](https://img.shields.io/pypi/pyversions/sigint-examples)
 
 A collection of Python modules and tests serving as an introduction to SIGINT (signal intelligence) techniques.
 
