@@ -8,6 +8,11 @@ A collection of Python scripts serving as an introduction to SIGINT (signal inte
 pip install -r requirements.txt
 ```
 
+```bash
+python -m pytest
+```
+
+
 - `amplitude_modulation.py`: generate a sequence of amplitude-moduled pulses, use filtering and autocorrelation to estimate PRI (pulse repitition interval)
 - `basic_workflow.py`: generate pulse train, add Gaussian noise, use autocorrelation to estimate PRI
 - `chirped_pulses.py`: simulates a noisy train of linear chirped pulses, applies a matched filter and autocorrelation to analyze it, and then estimates the PRI and pulse width from the matched filter output
