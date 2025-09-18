@@ -10,7 +10,18 @@ Demonstrates a simple pulse train workflow using the modular SIGINT library:
 import numpy as np
 from sigint_examples.simulation import generate_basic_pulse_train
 from sigint_examples.processing import matched_filter, autocorrelation, estimate_PRI_from_autocorr
-from sigint_examples.plotting import plot_basic_workflow, SHOW_PLOTS
+from sigint_examples.plotting import plot_basic_workflow
+import argparse
+
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="Run basic SIGINT workflow")
+parser.add_argument(
+    "--show-plots",
+    action="store_true",
+    help="Display plots during execution"
+)
+args = parser.parse_args()
+SHOW_PLOTS = args.show_plots
 
 # -----------------------------
 # Parameters
