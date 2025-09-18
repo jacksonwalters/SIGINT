@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-SHOW_PLOTS = True
+SHOW_PLOTS = False
 
 def plot_time_domain(t, signal, title="Signal"):
     plt.figure(figsize=(12,4))
