@@ -180,3 +180,41 @@ def estimate_pulse_widths(mf_output, t, peak_indices, window=20):
 
         widths.append(segment_times[right_idx] - segment_times[left_idx])
     return np.median(widths) if widths else None
+
+def estimate_delay(rx1, rx2, fs):
+    """
+    Estimate time delay between rx1 and rx2 using cross-correlation.
+    
+    Returns:
+        estimated_delay: in seconds
+        lags: lag vector for plotting
+        cross_corr: cross-correlation vector
+    """
+    cross_corr = correlate(rx2, rx1, mode='full')
+    lags = np.arange(-len(rx1)+1, len(rx1)) / fs
+    peak_idx = np.argmax(cross_corr)
+    estimated_delay = lags[peak_idx]
+    return estimated_delay, lags, cross_corr
+
+def autocorr_two_pulses(rx, fs):
+    auto = correlate(rx, rx, mode='full')
+    lags = np.arange(-len(rx)+1, len(rx)) / fs
+    positive_lags = lags[len(lags)//2:]
+    auto_positive = auto[len(auto)//2:]
+    return positive_lags, auto_positive
+
+def estimate_fundamentals(positive_lags, auto_positive, min_lag_us=20, threshold_ratio=0.3, tolerance=0.05):
+    peaks, _ = find_peaks(auto_positive, height=threshold_ratio*np.max(auto_positive))
+    peak_lags = positive_lags[peaks]  # in seconds
+    peak_lags_us = peak_lags * 1e6
+
+    fundamentals = []
+    for lag in sorted(peak_lags_us):
+        if lag < min_lag_us:
+            continue
+        # reject harmonics
+        is_harmonic = any(abs(lag/f - round(lag/f)) < tolerance for f in fundamentals)
+        if not is_harmonic:
+            fundamentals.append(lag)
+
+    return np.array(fundamentals)

@@ -180,3 +180,92 @@ def generate_chirped_train(fs, duration, PRI, pulse_width, fc, bandwidth):
         rx_signal[mask] += pulse
         
     return t, rx_signal, pulse_times
+
+def generate_time_delay_pulses(fs, duration, pulse_width, PRI, delay=0.0, SNR_dB=0, seed=None):
+    """
+    Generate two pulse trains for TDOA simulation:
+    - Receiver 1: reference pulse train
+    - Receiver 2: delayed copy of Receiver 1
+
+    Returns:
+        t: time vector
+        rx1_noisy: receiver 1 signal
+        rx2_noisy: receiver 2 signal (delayed)
+    """
+    if seed is not None:
+        np.random.seed(seed)
+
+    t = np.arange(0, duration, 1/fs)
+    num_pulses = int(duration / PRI)
+    pulse_times = np.arange(0, num_pulses * PRI, PRI)
+    pulse_times = pulse_times[pulse_times < duration]
+
+    # Receiver 1 signal
+    rx1 = np.zeros_like(t)
+    for pt in pulse_times:
+        mask = (t >= pt) & (t < pt + pulse_width)
+        rx1[mask] = 1.0
+
+    # Add noise
+    signal_power = np.mean(rx1**2)
+    SNR_linear = 10**(SNR_dB/10) if SNR_dB != 0 else 1
+    noise_power = signal_power / SNR_linear
+    rx1_noisy = rx1 + np.random.normal(0, np.sqrt(noise_power), size=t.size)
+
+    # Receiver 2 signal (delayed)
+    delay_samples = int(delay * fs)
+    rx2_noisy = np.zeros_like(t)
+    if delay_samples < len(t):
+        rx2_noisy[delay_samples:] = rx1_noisy[:len(t)-delay_samples]
+    rx2_noisy += np.random.normal(0, np.sqrt(noise_power), size=t.size)
+
+    return t, rx1_noisy, rx2_noisy
+
+def generate_two_pulse_train(fs, duration, PRI1, pulse_width1, PRI2, pulse_width2):
+    t = np.arange(0, duration, 1/fs)
+    
+    def gen_train(PRI, pulse_width):
+        num_pulses = int(duration / PRI)
+        pulse_times = np.arange(0, num_pulses * PRI, PRI)
+        rx = np.zeros_like(t)
+        for pt in pulse_times:
+            mask = (t >= pt) & (t < pt + pulse_width)
+            rx[mask] = 1.0
+        return rx
+
+    rx1 = gen_train(PRI1, pulse_width1)
+    rx2 = gen_train(PRI2, pulse_width2)
+    rx = rx1 + rx2
+
+    return t, rx, rx1, rx2
+
+import numpy as np
+
+def generate_basic_pulse_train(fs, duration, PRI, pulse_width, fc, SNR_dB, seed=None):
+    """
+    Generate a basic rectangular pulse train modulated by a carrier, optionally with noise.
+    
+    Returns:
+        t: time vector
+        clean_signal: carrier-modulated pulse train without noise
+        rx_signal: received signal with noise
+    """
+    if seed is not None:
+        np.random.seed(seed)
+    
+    t = np.arange(0, duration, 1/fs)
+    
+    # Pulse train (rectangular gate)
+    gate = (np.mod(t, PRI) < pulse_width).astype(float)
+    
+    # Modulate with carrier
+    clean_signal = gate * np.cos(2*np.pi*fc*t)
+    
+    # Add Gaussian noise
+    signal_power = np.mean(clean_signal**2)
+    SNR_linear = 10**(SNR_dB / 10) if SNR_dB != 0 else 1
+    noise_power = signal_power / SNR_linear
+    noise = np.random.normal(0, np.sqrt(noise_power), size=t.size)
+    rx_signal = clean_signal + noise
+    
+    return t, clean_signal, rx_signal

@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-SHOW_PLOTS = False
+SHOW_PLOTS = True
 
 def plot_time_domain(t, signal, title="Signal"):
     plt.figure(figsize=(12,4))
@@ -114,5 +114,88 @@ def plot_PRI_vs_time(pulse_times_detected, estimated_PRIs_clean, base_PRI, mean_
     plt.ylabel("PRI (µs)")
     plt.legend()
     plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
+def plot_tdoa(t, rx1, rx2, lags, cross_corr, estimated_delay):
+    plt.figure(figsize=(12, 6))
+
+    plt.subplot(3,1,1)
+    plt.plot(t*1e3, rx1)
+    plt.title("Receiver 1 Signal")
+    plt.xlabel("Time (ms)")
+    plt.ylabel("Amplitude")
+    plt.grid(True)
+
+    plt.subplot(3,1,2)
+    plt.plot(t*1e3, rx2)
+    plt.title("Receiver 2 Signal (Delayed)")
+    plt.xlabel("Time (ms)")
+    plt.ylabel("Amplitude")
+    plt.grid(True)
+
+    plt.subplot(3,1,3)
+    plt.plot(lags*1e6, cross_corr)
+    plt.title("Cross-Correlation Between Receiver 2 and 1")
+    plt.xlabel("Lag (µs)")
+    plt.ylabel("Amplitude")
+    plt.axvline(estimated_delay*1e6, color='r', linestyle='--', label='Estimated delay')
+    plt.legend()
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_two_pulse_autocorr(positive_lags, auto_positive, fundamentals):
+    plt.figure(figsize=(12,4))
+    plt.plot(positive_lags*1e6, auto_positive, label="Autocorrelation")
+    for f in fundamentals:
+        plt.axvline(f, color='r', linestyle='--', alpha=0.7, label=f"Fundamental {f:.1f} µs")
+    plt.title("Autocorrelation with Fundamental PRI Estimates")
+    plt.xlabel("Lag (µs)")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+def plot_basic_workflow(t, rx_signal, clean_signal, mf_output, auto, lags, 
+                        peak_lags=None, pulse_width_estimates=None):
+    
+    plt.figure(figsize=(12, 8))
+    
+    # Time-domain
+    plt.subplot(2,2,1)
+    plt.plot(t*1e3, rx_signal, label="Received")
+    plt.plot(t*1e3, clean_signal, alpha=0.7, label="Clean")
+    plt.xlabel("Time (ms)")
+    plt.ylabel("Amplitude")
+    plt.title("Received Pulse Train")
+    plt.grid(True)
+    plt.legend()
+
+    # Matched filter
+    plt.subplot(2,2,2)
+    plt.plot(t*1e3, mf_output)
+    plt.xlabel("Time (ms)")
+    plt.ylabel("Amplitude")
+    plt.title("Matched Filter Output")
+    plt.grid(True)
+
+    # Autocorrelation
+    plt.subplot(2,2,3)
+    plt.plot(lags*1e6, auto)
+    if peak_lags is not None:
+        for pl in peak_lags:
+            plt.axvline(pl*1e6, color='r', linestyle='--', alpha=0.7)
+    plt.xlabel("Lag (µs)")
+    plt.ylabel("Amplitude")
+    plt.title("Autocorrelation")
+    plt.grid(True)
+
+    # Optional: pulse width estimates overlay
+    if pulse_width_estimates is not None:
+        for pw in pulse_width_estimates:
+            plt.axhline(pw, color='orange', linestyle=':', alpha=0.7)
+
     plt.tight_layout()
     plt.show()
