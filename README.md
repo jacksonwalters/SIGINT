@@ -2,7 +2,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 ![basic-tests](https://github.com/jacksonwalters/SIGINT/actions/workflows/python-tests.yml/badge.svg)
 
-A collection of Python scripts serving as an introduction to SIGINT (signal intelligence) techniques.
+A collection of Python modules and tests serving as an introduction to SIGINT (signal intelligence) techniques.
 
 ## Dependencies
 
