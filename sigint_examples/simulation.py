@@ -108,3 +108,53 @@ def generate_multi_emitter_jittered_pulses(fs=1_000_000, duration=0.01,
     rx_noisy = rx_clean + noise
 
     return t, rx_noisy, pulse_times_list
+
+def generate_pulse_train(PRI, pulse_width, duration, fs, amplitude=1.0):
+    """
+    Generate a rectangular pulse train with fixed PRI and width.
+    
+    Parameters
+    ----------
+    PRI : float
+        Pulse Repetition Interval (seconds).
+    pulse_width : float
+        Pulse width (seconds).
+    duration : float
+        Total duration of signal (seconds).
+    fs : float
+        Sampling rate (Hz).
+    amplitude : float
+        Pulse amplitude.
+
+    Returns
+    -------
+    rx : np.ndarray
+        The generated signal.
+    pulse_times : np.ndarray
+        The start times of each pulse.
+    """
+    num_pulses = int(duration / PRI) + 1
+    pulse_times = np.arange(0, num_pulses) * PRI
+    pulse_times = pulse_times[pulse_times < duration]
+    t = np.arange(0, duration, 1/fs)
+    rx = np.zeros_like(t)
+    for pt in pulse_times:
+        mask = (t >= pt) & (t < pt + pulse_width)
+        rx[mask] = amplitude
+    return rx, pulse_times
+
+def generate_gaussian_jittered_pulses(fs, duration, base_PRI, pulse_width, jitter_std, seed=0):
+    """Generate a pulse train with Gaussian PRI jitter."""
+    np.random.seed(seed)
+    num_pulses = int(duration / base_PRI) + 5
+    PRIs = base_PRI + np.random.randn(num_pulses) * jitter_std
+    pulse_times = np.cumsum(PRIs)
+    pulse_times = pulse_times[pulse_times < duration]
+
+    t = np.arange(0, duration, 1/fs)
+    rx = np.zeros_like(t)
+    for pt in pulse_times:
+        mask = (t >= pt) & (t < pt + pulse_width)
+        rx[mask] = 1.0
+
+    return t, rx, pulse_times

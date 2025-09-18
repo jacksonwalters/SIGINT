@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.signal import correlate, find_peaks
+from scipy.signal import correlate, find_peaks, convolve
 
 def matched_filter(signal, pulse_width, fs):
     pulse_samples = int(pulse_width * fs)
@@ -71,3 +71,74 @@ def detect_fundamental_PRIs(auto_pos, lags_pos, N_emitters=2, min_PRI=None, tol=
         if not is_harmonic:
             fundamentals.append(lag_us)
     return np.array(fundamentals[:N_emitters]), peak_lags_us, peaks
+
+def add_awgn(signal, SNR_dB, seed=None, rng=None):
+    """
+    Additive White Gaussian Noise to achieve target SNR.
+    
+    Parameters
+    ----------
+    signal : np.ndarray
+        Input clean signal.
+    SNR_dB : float
+        Desired SNR in dB (relative to signal power).
+    rng : np.random.Generator, optional
+        Random generator (default None, uses np.random).
+
+    Returns
+    -------
+    noisy_signal : np.ndarray
+    """
+    if rng is None:
+        rng = np.random.default_rng()
+
+    signal_power = np.mean(signal**2)
+    SNR_linear = 10**(SNR_dB / 10)
+    noise_power = signal_power / SNR_linear
+    noise = rng.normal(0, np.sqrt(noise_power), size=signal.shape)
+    return signal + noise
+
+def matched_filter_detect(rx_noisy, pulse_width, fs, base_PRI, jitter_std):
+    """Apply matched filtering and detect peaks."""
+    pulse_samples = int(pulse_width * fs)
+    template = np.ones(pulse_samples)
+
+    mf_output = convolve(rx_noisy, template[::-1], mode='valid')
+    t_valid = np.arange(len(mf_output)) / fs
+
+    threshold = 0.3 * np.max(mf_output)
+    min_PRI_samples = int((base_PRI - 3*jitter_std) * fs)
+    min_distance_samples = max(min_PRI_samples, pulse_samples)
+
+    peaks, properties = find_peaks(
+        mf_output, 
+        height=threshold, 
+        distance=min_distance_samples
+    )
+
+    template_delay = (pulse_samples - 1) / (2*fs)
+    pulse_times_detected = t_valid[peaks] + template_delay
+
+    return mf_output, t_valid, peaks, pulse_times_detected, threshold
+
+def estimate_PRI_statistics(pulse_times_detected):
+    """Estimate PRI statistics with outlier removal."""
+    if len(pulse_times_detected) <= 1:
+        return None, None, None
+
+    estimated_PRIs = np.diff(pulse_times_detected)
+    mean_PRI = np.mean(estimated_PRIs)
+    std_PRI = np.std(estimated_PRIs)
+
+    valid_mask = np.abs(estimated_PRIs - mean_PRI) <= 3 * std_PRI
+    estimated_PRIs_clean = estimated_PRIs[valid_mask]
+
+    if len(estimated_PRIs_clean) > 1:
+        mean_PRI_clean = np.mean(estimated_PRIs_clean)
+        std_PRI_clean = np.std(estimated_PRIs_clean)
+    else:
+        mean_PRI_clean = mean_PRI
+        std_PRI_clean = std_PRI
+        estimated_PRIs_clean = estimated_PRIs
+
+    return estimated_PRIs_clean, mean_PRI_clean, std_PRI_clean
