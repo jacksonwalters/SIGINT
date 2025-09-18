@@ -6,6 +6,18 @@
 
 A collection of Python modules and tests serving as an introduction to SIGINT (signal intelligence) techniques.
 
+## Installation
+
+```bash
+pip install sigint-examples
+```
+
+To perform a basic workflow:
+
+```bash
+sigint-workflow --show-plots
+```
+
 ## Dependencies
 
 ```bash
